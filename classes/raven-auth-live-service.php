@@ -1,4 +1,13 @@
------BEGIN CERTIFICATE-----
+<?php
+
+class RavenAuthLiveService implements RavenAuthServiceInterface {
+	public function getURL() {
+		return 'https://raven.cam.ac.uk/auth/authenticate.html';
+	} 
+
+	public function getCertificate($kid=2) {
+		if($kid == 2) {
+			return '-----BEGIN CERTIFICATE-----
 MIIDrTCCAxagAwIBAgIBADANBgkqhkiG9w0BAQQFADCBnDELMAkGA1UEBhMCR0Ix
 EDAOBgNVBAgTB0VuZ2xhbmQxEjAQBgNVBAcTCUNhbWJyaWRnZTEgMB4GA1UEChMX
 VW5pdmVyc2l0eSBvZiBDYW1icmlkZ2UxKDAmBgNVBAsTH0NvbXB1dGluZyBTZXJ2
@@ -19,4 +28,9 @@ IHB1YmxpYyBrZXkgMoIBADAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBAUAA4GB
 AFciErbr6zl5i7ClrpXKA2O2lDzvHTFM8A3rumiOeauckbngNqIBiCRemYapZzGc
 W7fgOEEsI4FoLOjQbJgIrgdYR2NIJh6pKKEf+9Ts2q/fuWv2xOLw7w29PIICeFIF
 hAM+a6/30F5fdkWpE1smPyrfASyXRfWE4Ccn1RVgYX9u
------END CERTIFICATE-----
+-----END CERTIFICATE-----';
+		} else {
+			throw RavenAuthUnknownKIDException();
+		}
+	}
+}

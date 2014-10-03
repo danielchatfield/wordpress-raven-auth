@@ -21,3 +21,13 @@ function ra_get_option( $option, $default = false ) {
 function ra_set_option( $option, $value ) {
 	return set_option( "ravenauth_" . $option, $value);
 }
+
+/*
+    Formats a timestamp into the format required by Raven
+*/
+function ra_format_timestamp( $timestamp = null ) {
+    if ( is_null($timestamp) ) {
+        $timestamp = time();
+    }
+    return gmdate('Ymd\THis\Z', $timestamp);
+}
