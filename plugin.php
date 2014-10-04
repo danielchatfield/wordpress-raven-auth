@@ -38,7 +38,7 @@ if ($problem) {
                     'WordPress Raven Auth requires PHP version %s or greater.',
                     'ravenauth'
                 ),
-                $required_php_version,
+                $required_php_version
             );
         }
 
@@ -48,7 +48,7 @@ if ($problem) {
                     'WordPress Raven Auth requires WordPress version %s or greater.',
                     'ravenauth'
                 ),
-                $required_wp_version,
+                $required_wp_version
             );
         }
 
@@ -58,7 +58,7 @@ if ($problem) {
                     'WordPress Raven Auth requires openssl.',
                     'ravenauth'
                 ),
-                $openssl_missing,
+                $openssl_missing
             );
         }
 
@@ -76,6 +76,6 @@ require_once( dirname(__FILE__) . '/errors.php' );
 
 // Load plugin using singleton
 if (function_exists('add_action')) {
-    add_action('plugins_loaded', array('RavenAuth', 'getInstance'));
-    register_activation_hook( __FILE__, array( 'RavenAuth', 'install' ) );
+    add_action('plugins_loaded', array('RavenAuthPlugin', 'getInstance'));
+    register_activation_hook( __FILE__, array( 'RavenAuthPlugin', 'install' ) );
 }

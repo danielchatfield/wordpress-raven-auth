@@ -15,7 +15,7 @@ class RavenAuthResource {
         SECURITY NOTICE: The host can be spoofed, do not trust the result!
     */
     public function getRequestURI() {
-        return $this->getScheme . "://" . $this->getHost() . $this->getPath();
+        return $this->getScheme() . "://" . $this->getHost() . $this->getPath();
     }
 
     public function getScheme() {
@@ -28,15 +28,35 @@ class RavenAuthResource {
 
         // ignore standard http and https ports
         if (('http' == $scheme && $port == 80) || ('https' == $scheme && $port == 443)) {
-            return $this->getHost();
+            return $this->_getHost();
         }
 
-        return $this->getHost().':'.$port;
+        return $this->_getHost().':'.$port;
+    }
+
+    public function _getHost() {
+        $host = '';
+
+        if (array_key_exists('HTTP_HOST', $_SERVER)) {
+            $host = $_SERVER['HTTP_HOST'];
+        } elseif (array_key_exists('SERVER_NAME', $_SERVER)) {
+            $host = $_SERVER['SERVER_NAME'];
+        } elseif (array_key_exists('SERVER_ADDR', $_SERVER)) {
+            $host = $_SERVER['SERVER_ADDR'];
+        }
+
+        $host = strtolower(preg_replace('/:\d+$/', '', trim($host)));
+
+        if ($host && '' !== preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $host)) {
+            throw new Exception(sprintf('Invalid Host "%s"', $host));
+        }
+
+        return $host;
     }
 
     public function getPort() {
         // HTTP_HOST is optional for http 1.0
-        if (isset($_SERVER['HTTP_HOST']) {
+        if (isset($_SERVER['HTTP_HOST'])) {
 
             $host = $_SERVER['HTTP_HOST'];
 

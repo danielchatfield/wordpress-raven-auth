@@ -85,8 +85,10 @@ class RavenAuthResponse extends RavenAuthResource {
 
         parent::__construct($raven_service);
 
+
         if (!is_null($response)) {
             $this->raw_response = $response;
+            $this->parseResponse();
         }
     }
 
@@ -98,16 +100,16 @@ class RavenAuthResponse extends RavenAuthResource {
         $fields = explode('!', $response);
 
         if ($fields[0] != 3) {
-            throw RavenAuthBadResponseException(
+            throw new RavenAuthBadResponseException(
                     'The version in the response from raven does not match the '.
                     'expected raven version number.');
         }
 
         $expected_fields = 14;
-        $actual_fields = count($parts);
+        $actual_fields = count($fields);
 
         if ($actual_fields !== $expected_fields) {
-            throw RavenAuthBadResponseException(
+            throw new RavenAuthBadResponseException(
                     "Incorrect number of fields in raven response, expected ".
                     "{$expected_fields} but got {$actual_fields}");
         }
@@ -141,32 +143,33 @@ class RavenAuthResponse extends RavenAuthResource {
             $this->fields['sig']
         );
 
-        return base64_decode($result)
+        return base64_decode($sig);
     }
 
     public function verifySignature() {
         $kid = $this->fields['kid'];
         $key = openssl_pkey_get_public($this->getRavenService()->getCertificate($kid));
-        $result = openssl_verify($this->signature_digest, $this->decodeSignature())
+        $result = openssl_verify($this->signature_digest, $this->decodeSignature(), $key);
 
         if ($result === 1) {
-            return TRUE;
+            return true;
         }
 
         if ($result === 0) {
-            throw RavenAuthResponseVerificationException(
+            throw new RavenAuthResponseVerificationException(
                 'The raven response signature was incorrect');
         }
 
-        throw RavenAuthResponseVerificationException(
+        throw new RavenAuthResponseVerificationException(
             'An error occurred whilst checking the raven response signature');
     }
 
     public function verifyIssue($seconds = 45) {
         if(time() - strtotime($this->fields['issue']) > $seconds) {
-             throw RavenAuthResponseVerificationException(
+             throw new RavenAuthResponseVerificationException(
                 'Too many seconds have elapsed since this token was signed');
         }
+        return true;
     }
 
 
@@ -197,12 +200,12 @@ class RavenAuthResponse extends RavenAuthResource {
 
         if (!$trust_all_hosts) {
             if (is_null($trusted_hosts)) {
-                throw RavenAuthResponseVerificationException(
+                throw new RavenAuthResponseVerificationException(
                     'No trusted hosts set and "trust all hosts" is off');
             }
 
             if (!$this->verifyHost($request_uri, $trusted_hosts)) {
-                throw RavenAuthResponseVerificationException(
+                throw new RavenAuthResponseVerificationException(
                     'The host for this request is not trusted.');
             }
         }
@@ -210,7 +213,7 @@ class RavenAuthResponse extends RavenAuthResource {
         // all is well - we can check it now
 
         if ($request_uri !== $this->fields['url']) {
-            throw RavenAuthResponseVerificationException(
+            throw new RavenAuthResponseVerificationException(
                     'The request URL does not match the one in the token');
         }
         
@@ -246,8 +249,16 @@ class RavenAuthResponse extends RavenAuthResource {
         return $this->fields['params'] === $params;
     }
 
+    public function verifyPtags($ptags = 'current') {
+        return $this->fields['ptags'] === $ptags;
+    }
+
     public function getParams() {
         return $this->fields['params'];
+    }
+
+    public function getPrincipal() {
+        return $this->fields['principal'];
     }
 
 

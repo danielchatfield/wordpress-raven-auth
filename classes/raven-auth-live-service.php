@@ -30,7 +30,7 @@ W7fgOEEsI4FoLOjQbJgIrgdYR2NIJh6pKKEf+9Ts2q/fuWv2xOLw7w29PIICeFIF
 hAM+a6/30F5fdkWpE1smPyrfASyXRfWE4Ccn1RVgYX9u
 -----END CERTIFICATE-----';
 		} else {
-			throw RavenAuthUnknownKIDException();
+			throw new RavenAuthUnknownKIDException();
 		}
 	}
 }

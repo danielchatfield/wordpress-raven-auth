@@ -10,8 +10,7 @@ class RavenAuthException extends Exception {
 }
 
 class RavenAuthUnknownKIDException extends RavenAuthException {
-	var $message = 'The key ID specified does not match any key, this might mean '.
-                   'that raven has started to use a new key following a compromise.';
+	var $message = 'The key ID specified does not match any key, this might mean that raven has started to use a new key following a compromise.';
 }
 
 class RavenAuthUnknownRequestParameterException extends RavenAuthException {
@@ -20,16 +19,16 @@ class RavenAuthUnknownRequestParameterException extends RavenAuthException {
         $args = func_get_args();
         $param = array_shift($args);
 
-        $this->message = "The paramater '$param' is not recognised";
+        $this->message = "The parameter '$param' is not recognised";
 
         call_user_func_array(array($this, 'parent::__construct'), $args);
     }
 }
 
-class RavenAuthBadResponseException extends RavenException {
+class RavenAuthBadResponseException extends RavenAuthException {
 
 }
 
-class RavenAuthResponseVerificationException extends RavenException {
+class RavenAuthResponseVerificationException extends RavenAuthException {
 
 }

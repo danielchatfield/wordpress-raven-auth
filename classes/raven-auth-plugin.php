@@ -1,5 +1,5 @@
 <?php
-class RavenAuth {
+class RavenAuthPlugin extends RavenAuthClient {
     private static $instance = null;
     private $admin = null;
 
@@ -39,7 +39,7 @@ class RavenAuth {
 
     public function getAdmin() {
         if($this->admin === null) {
-            $this->admin = new RavenAuth_Admin();
+            $this->admin = new RavenAuthAdmin();
         }
     }
 
@@ -48,54 +48,42 @@ class RavenAuth {
     }
 
     public function loginUser() {
-        $webauth = new Ucam_Webauth(array(
-            'key_dir'       => $this->getKeysDirectory(),
-            'cookie_key'    => ra_get_option('salt'),
-            'cookie_name'   => 'wordpress_raven_auth',
-            'hostname'      => $_SERVER['HTTP_HOST'],
-        ));
-
-        $auth = $webauth->authenticate();
-
-        if(!$auth) {
-            wp_die($webauth->status() . " " . $webauth->msg());
+        $site_name = get_bloginfo();
+        try {
+            $this->authenticate($site_name);
+        } catch (RavenAuthException $e) {
+            wp_die($e->getMessage());
         }
+    }
 
-        if(!($webauth->success())) {
-            wp_die("Raven Authentication not completed.");
-        }
-
-        $username = $webauth->principal();
-        $email = $username . '@cam.ac.uk';
-
-        wp_die($email);
+    public function setSession() {
+        $crsid = $this->crsid;
+        $email = $crsid . '@cam.ac.uk';
 
         if (function_exists('get_user_by') && function_exists('wp_create_user')) {
-            if(!$this->userExists($username)) {
-                $user_id = wp_create_user( $username, wp_generate_password( $length=25 ), $email );
+            if(!$this->userExists($crsid)) {
+                $user_id = wp_create_user( $crsid, wp_generate_password( $length=25 ), $email );
 
                 if ( !$user_id )  {
                     wp_die('Could not create user');
                 }
             }
 
-            $user = $this->getWpUser($username);
-            wp_set_auth_cookie( $user->id);
+            $user = $this->getWpUser($crsid);
+            wp_set_auth_cookie($user->id);
             do_action('wp_login', $user->user_login, $user);
-
-            session_start();
-
-            if (isset($_SESSION["ravenauth_redirect_to"])) {
-                wp_safe_redirect($_SESSION["ravenauth_redirect_to"]);
-                unset($_SESSION["ravenauth_redirect_to"]);
-            }
-            else {
-                wp_safe_redirect( home_url() );
-            }
-        }
-        else
-        {
+        } else {
             wp_die('Something went wrong adding the user to the database');
+        }
+    }
+
+    public function redirect() {
+        if (is_null($this->redirect_to)) {
+            wp_safe_redirect(admin_url());
+            exit;
+        } else {
+            wp_safe_redirect($this->redirect_to);
+            exit;
         }
     }
 

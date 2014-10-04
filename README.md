@@ -42,3 +42,6 @@ $request = new RavenAuthRequest($parameters, $raven_service);
 echo $request->getRavenURL();
 // https://demo.raven.cam.ac.uk/auth/authenticate.html?ver=3&date=20141003131322z&desc=Readme%20example%20site&url=https%3A%2F%2Fexample.com
 ``` 
+
+#### RAVEN_TRUST_ALL_HOSTS
+

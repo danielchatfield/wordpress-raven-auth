@@ -31,7 +31,7 @@ LSxbGuFG9yfPFIqaSntlYMxKKB5ba/tIAMzyAOHxdEM5hi1DXRsOok3ElWjOw9oN
 wOq24EIbX5LquL9w+uvnfXw=
 -----END CERTIFICATE-----';
 		} else {
-			throw RavenAuthUnknownKIDException();
+			throw new RavenAuthUnknownKIDException();
 		}
 	}
 
@@ -53,7 +53,7 @@ Y6iyl0/GyBRzAXYemQJAVeChw15Lj2/uE7HIDtkqd8POzXjumOxKPfESSHKxRGnP
 3EruVQ6+SY9CDA1xGfgDSkoFiGhxeo1lGRkWmz09Yw==
 -----END RSA PRIVATE KEY-----';
 		} else {
-			throw RavenAuthUnknownKIDException();
+			throw new RavenAuthUnknownKIDException();
 		}
 	}
 }

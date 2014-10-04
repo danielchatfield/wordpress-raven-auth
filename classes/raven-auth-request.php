@@ -50,7 +50,7 @@ class RavenAuthRequest extends RavenAuthResource {
                 if the status code isn't going to be 200 rather than redirect back.
 
     */
-    public function __construct( $parameters = array(), $raven_service = null ) {
+    public function __construct($parameters = array(), $raven_service = null) {
 
         // Set some sensible defaults
         $this->parameters['ver'] = 3;
@@ -66,10 +66,10 @@ class RavenAuthRequest extends RavenAuthResource {
     }
 
     public function setParameter($parameter, $value) {
-        if (array_key_exists($parameter, $this->valid_parameters)) {
+        if (in_array($parameter, $this->valid_parameters)) {
             $this->parameters[$parameter] = $value;
         } else {
-            throw RavenAuthUnknownRequestParameterException($parameter);
+            throw new RavenAuthUnknownRequestParameterException($parameter);
         }
     }
 
@@ -78,9 +78,9 @@ class RavenAuthRequest extends RavenAuthResource {
         Returns the Raven URL to redirect to
     */
     public function getRavenURL() {
-        $raven_url = $this->getRavenService->getURL();
+        $raven_url = $this->getRavenService()->getURL();
         $query = http_build_query($this->parameters);
 
-        return $raven_url + '?' + $query;
+        return $raven_url . '?' . $query;
     }
 }
