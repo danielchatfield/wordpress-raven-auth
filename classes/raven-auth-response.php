@@ -237,6 +237,10 @@ class RavenAuthResponse extends RavenAuthResource {
         return false;
     }
 
+    public function verifyAuthOrSSO($type = "pwd") {
+        return $this->verifyAuth() || $this->verifySSO();
+    }
+
     public function verifyAuth($type = "pwd") {
         return $this->fields['auth'] === $type;
     }

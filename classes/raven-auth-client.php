@@ -17,7 +17,10 @@ class RavenAuthClient {
     /*
         Raven environment should be either "live", "demo" or null to use the server default.
     */
-    public function __constuct($raven_environment = null) {
+    public function __constuct($trusted_hosts, $raven_environment = null) {
+        
+
+        
         if (!is_null($raven_environment)) {
             switch($raven_environment) {
                 case 'live':
