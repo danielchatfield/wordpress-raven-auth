@@ -45,3 +45,16 @@ echo $request->getRavenURL();
 
 #### RAVEN_TRUST_ALL_HOSTS
 
+First, some background: when a website redirects to raven it includes the URL for 
+raven to redirect back to. Raven uses this URL as part of the token that it signs 
+to prevent tokens that were issued for one site being used on another. However, 
+on many hosting environments it is not possible to reliably determine the host 
+for the website since the server itself doesn't know it and just uses the `HOST` 
+http header. By spoofing this header an attacker with an access token for one 
+website can replay it onto another. At its lowest level (`RavenAuthResponse`), the 
+library will let you take care of this however you want (but it will make sure 
+that you take care of it) - you can pass a string (or array of strings) that 
+contains a "trusted host" that the request host is matched against or you can 
+signify that you (the application that is consuming the library) take full 
+responsibility for verifying this by passing in a flag to the `verifyURL` method 
+or setting `RAVEN_TRUST_ALL_HOSTS` to `TRUE`.
