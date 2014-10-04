@@ -146,6 +146,13 @@ class RavenAuthResponse extends RavenAuthResource {
         return base64_decode($sig);
     }
 
+    public function verifyStatus() {
+        if ($this->fields['status'] != 200) {
+            throw new RavenAuthException($this->fields['msg']);
+        }
+        return true;
+    }
+
     public function verifySignature() {
         $kid = $this->fields['kid'];
         $key = openssl_pkey_get_public($this->getRavenService()->getCertificate($kid));
@@ -238,7 +245,11 @@ class RavenAuthResponse extends RavenAuthResource {
     }
 
     public function verifyAuthOrSSO($type = "pwd") {
-        return $this->verifyAuth() || $this->verifySSO();
+        if (!$this->verifyAuth() && !$this->verifySSO()) {
+            throw new RavenAuthResponseVerificationException(
+                'An acceptable authentication scheme was not used');
+        }
+        return true;
     }
 
     public function verifyAuth($type = "pwd") {

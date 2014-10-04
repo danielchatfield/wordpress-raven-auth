@@ -18,9 +18,9 @@ class RavenAuthClient {
         Raven environment should be either "live", "demo" or null to use the server default.
     */
     public function __constuct($trusted_hosts, $raven_environment = null) {
-        
 
-        
+
+
         if (!is_null($raven_environment)) {
             switch($raven_environment) {
                 case 'live':
@@ -121,6 +121,11 @@ class RavenAuthClient {
         }
 
         $this->response = new RavenAuthResponse($response, $this->raven_service);
+
+        // check status
+        if (!$this->response->verifyStatus()) {
+            throw new RavenAuthException('Status code not success');
+        }
 
         // check signature
         if (!$this->response->verifySignature()) {
