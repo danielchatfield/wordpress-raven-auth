@@ -56,7 +56,18 @@ class RavenAuthPlugin extends RavenAuthClient {
         }
     }
 
+
+    /*
+        This overloads RavenAuthClient->setSession() so that we can use the WordPress
+        users API.
+
+        Note that we still call the parent setSession as this stores the info required
+        to ascertain whether the user is an alumni or not and is thus still useful even 
+        though the CRSID is redundant.
+    */
     public function setSession() {
+        parent::setSession();
+
         $crsid = $this->crsid;
         $email = $crsid . '@cam.ac.uk';
 
@@ -88,7 +99,7 @@ class RavenAuthPlugin extends RavenAuthClient {
     }
 
     public function logout() {
-        setcookie('wordpress_raven_auth', '');
+        parent::logout();
         wp_clear_auth_cookie();
     }
 

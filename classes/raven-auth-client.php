@@ -40,22 +40,48 @@ class RavenAuthClient {
            raven response
 
 
-        If $force_relogin is true then raven will require the user to input 
+        If $require_password_entry is true then raven will require the user to input 
         their password even if they have an active session.
 
         If $allow_alumni is false then students and staff that do not match 
         the University's definition of "current" will not be allowed.
     */
-    public function authenticate($site_name = null, $login_message = null, $force_relogin = false, $allow_alumni = false, $redirect_to = null) {
+    public function authenticate($site_name = null, $login_message = null, $require_password_entry = false, $allow_alumni = false, $redirect_to = null) {
+
+        // check if we have a session
+        try {
+            if ($session = $this->getSession(true)) {
+                if (
+                    ($allow_alumni || $session['current']) && 
+                    (!$require_password_entry || $session['password_entered']
+                ) {
+                    // session is valid for this request (either the user 
+                    // is current or we are allowing non-current users) 
+                    // and either we aren't forcing password entry or the 
+                    // password was entered
+                    return $session['crsid'];
+                }
+            }
+        } catch (RavenAuthException $e) {
+            // this will occur if the session has been borked - if this 
+            // happens then we should just remove the session and start 
+            // again.
+            $this->logout();
+        }
+
+        // no valid session - lets continue
+
         // check for raven response
         if (array_key_exists('WLS-Response', $_GET)) {
-            $this->crsid = $this->processResponse($_GET['WLS-Response'], $force_relogin, $allow_alumni);
+            $this->crsid = $this->processResponse($_GET['WLS-Response'], $require_password_entry, $allow_alumni);
             $this->setSession();
             $this->redirect();
+
+            // this only gets executed if redirect() has been overloaded and no longer redirects
+            return $this->crsid;
         }
 
         // no raven response - need to redirect
-
 
         $parameters = array();
 
@@ -82,7 +108,7 @@ class RavenAuthClient {
         $this->_redirect($this->request->getRavenURL());
     }
 
-    public function processResponse($response = null, $force_relogin = false, $allow_alumni = false) {
+    public function processResponse($response = null, $require_password_entry = false, $allow_alumni = false) {
         if (is_null($response)) {
             if (array_key_exists('WLS-Response', $_GET)) {
                 $response = $_GET['WLS-Response'];
@@ -111,9 +137,9 @@ class RavenAuthClient {
                 'The request URL is either untrusted or doesn\'t match the token');
         }
 
-        if ($force_relogin && !$this->response->verifyAuth()) {
+        if ($require_password_entry && !$this->response->verifyAuth()) {
             throw new RavenAuthResponseVerificationException(
-                'Relogin was requested but raven is not reporting that it happened.');
+                'Password entry was requested but raven is not reporting that it happened.');
         }
 
         if (!$allow_alumni && !$this->response->verifyPtags('current')) {
@@ -149,6 +175,54 @@ class RavenAuthClient {
         session_start();
 
         $_SESSION['raven_crsid'] = $this->crsid;
+        $_SESSION['raven_ptags'] = $this->response->getPtags();
+        $_SESSION['raven_password_entered'] = $this->response->verifyAuth() ||
+            (array_key_exists('raven_password_entered', $_SESSION) && $_SESSION['raven_password_entered']);
+    }
+
+
+    /*
+        Returns either null to indicate no session or if $full is 
+        false then returns the crsid or if it is true returns this:
+
+        array(
+            'crsid'  =>  $crsid,
+            'current' => $is_current,
+            'password_entered'  => $password_entered
+        );
+
+        'current' is true if raven has indicated that the user meets 
+        the university definition of "current staff or student".
+
+        'password_entered' is true when the user physically entered 
+        their password into raven;
+    */
+    public function getSession($full = false) {
+        session_start();
+
+        if (!array_key_exists('raven_crsid', $_SESSION)) {
+            return null;
+        }
+
+        if (!$full) {
+            return $_SESSION['raven_crsid'];
+        }
+
+        if (!array_key_exists('raven_ptags', $_SESSION)) {
+            throw RavenAuthException('CRSID is set in session but ptags are not');
+        }
+
+        $password_entered = false;
+
+        if (array_key_exists('raven_password_entered', $_SESSION)) {
+            $password_entered = $_SESSION['raven_password_entered'];
+        }
+
+        return array(
+            'crsid' => $_SESSION['raven_crsid'],
+            'current' => $_SESSION['raven_ptags'] === 'current',
+            'password_entered' => $password_entered
+        );
     }
 
     public function redirect() {
@@ -165,7 +239,7 @@ class RavenAuthClient {
     }
 
     public function logout() {
-        foreach (array('raven_crsid', 'raven_auth_csrf_token') as $key) {
+        foreach (array('raven_crsid', 'raven_csrf_token', 'raven_ptags', 'raven_password_entered') as $key) {
             if (array_key_exists($key, $_SESSION)) {
                 unset($_SESSION[$key]);
             }
@@ -175,11 +249,11 @@ class RavenAuthClient {
     public function getCSRFToken() {
         session_start();
 
-        if (!array_key_exists('raven_auth_csrf_token', $_SESSION)) {
-            $_SESSION['raven_auth_csrf_token'] = $this->generateCSRFToken();
+        if (!array_key_exists('raven_csrf_token', $_SESSION)) {
+            $_SESSION['raven_csrf_token'] = $this->generateCSRFToken();
         }
 
-        return $_SESSION['raven_auth_csrf_token'];
+        return $_SESSION['raven_csrf_token'];
     }
 
     // This should have enough entropy to be more secure than most people's passwords

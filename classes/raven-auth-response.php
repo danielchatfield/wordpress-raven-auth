@@ -257,6 +257,10 @@ class RavenAuthResponse extends RavenAuthResource {
         return $this->fields['params'];
     }
 
+    public function getPtags() {
+        return $this->fields['params'];
+    }
+
     public function getPrincipal() {
         return $this->fields['principal'];
     }
