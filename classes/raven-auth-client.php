@@ -56,7 +56,7 @@ class RavenAuthClient {
             if ($session = $this->getSession(true)) {
                 if (
                     ($allow_alumni || $session['current']) && 
-                    (!$require_password_entry || $session['password_entered']
+                    (!$require_password_entry || $session['password_entered'])
                 ) {
                     // session is valid for this request (either the user 
                     // is current or we are allowing non-current users) 
