@@ -80,7 +80,7 @@ class RavenAuthPlugin extends RavenAuthClient {
                 }
             }
 
-            $user = $this->getWpUser($crsid);
+            $user = $this->getWPUser($crsid);
             wp_set_auth_cookie($user->id);
             do_action('wp_login', $user->user_login, $user);
         } else {
@@ -107,7 +107,7 @@ class RavenAuthPlugin extends RavenAuthClient {
         return (get_user_by('login', $crsid) != false);
     }
 
-    public function getWpUser($crsid) {
+    public function getWPUser($crsid) {
         return get_user_by('login', $crsid);
     }
 
