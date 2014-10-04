@@ -1,13 +1,13 @@
 <?php
-/**
- * Plugin Name: WordPress Raven Auth
- * Plugin URI: https://github.com/danielchatfield/wordpress-raven-auth
- * Description: Quick and easy auth for University of Cambridge sites.
- * Author: Daniel Chatfield
- * Author URI: http://www.danielchatfield.com
- * Version 0.0.1
- *
- * GitHub Plugin URI: danielchatfield/wordpress-raven-auth
+/*
+   Plugin Name: WordPress Raven Auth
+   Plugin URI: https://github.com/danielchatfield/wordpress-raven-auth
+   Description: Quick and easy auth for University of Cambridge sites.
+   Author: Daniel Chatfield
+   Author URI: http://www.danielchatfield.com
+   Version 0.0.1
+  
+   GitHub Plugin URI: danielchatfield/wordpress-raven-auth
  */
 
 $required_php_version = '5.2.4';
