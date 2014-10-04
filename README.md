@@ -134,7 +134,7 @@ the neccessary methods for parsing and verifying the response.
 new RavenAuthRequest($parameters = array(), $raven_service = null);
 ```
 
-`$parameters` is an optional array of raven parameters as specified [here](blob/b431bf50fef32aa201ad1f4a1579c8ce14268832/classes/raven-auth-request.php#L18-L50).
+`$parameters` is an optional array of raven parameters as specified [here](classes/raven-auth-request.php#L18-L50).
 
 `$raven_service` is an optional instance of a class that implements the 
 `RavenAuthServiceInterface` - this is useful for using the demo raven server.
