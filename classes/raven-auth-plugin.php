@@ -14,7 +14,7 @@ class RavenAuthPlugin extends RavenAuthClient {
     }
 
     public static function install() {
-        RavenAuth::getInstance()->_install();
+        RavenAuthPlugin::getInstance()->_install();
     }
 
     private function __construct() {
