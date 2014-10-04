@@ -57,7 +57,7 @@ $client->authenticate(
     $login_message,          /* The login message that Raven displays to the user */
     $require_password_entry, /* If true (defaults to false) then raven will require
                                 user to enter password even if they have an active
-                                session. /*
+                                session. */
     $allow_alumni,           /* If true (defaults to false) then it will accept people 
                                 that don't meet Cambridge's definition of "current" */
     $redirect_to             /* Where to redirect to afterwards - if not set then it 
@@ -75,14 +75,14 @@ Calling `$client->authenticate()` will result in one of the following:
  - if the response from raven is valid then it will set the session and redirect 
    to `$redirect_to`, otherwise
  - the response is not valid - one of these exceptions will be thrown:
- - - `RavenAuthException()`
- - - `RavenAuthUnknownKIDException()` - this means that the response from raven
+   - `RavenAuthException()`
+   - `RavenAuthUnknownKIDException()` - this means that the response from raven
      was signed with a private key that is not present in the library - this 
      could happen if the raven server was compromised and they had to start using 
      a new key.
- - - `RavenAuthBadResponseException()` - the response was malformed and couldn't 
+   - `RavenAuthBadResponseException()` - the response was malformed and couldn't 
      be parsed.
- - - `RavenAuthResponseVerificationException()` - the response failed verification, 
+   - `RavenAuthResponseVerificationException()` - the response failed verification, 
      this could mean that the timestamp in the token was too old, or that the user 
      is not a current member of the university and `allow_alumni` is not enabled, or 
      that the signature was incorrect.
@@ -128,7 +128,11 @@ from [`RavenAuthResource`](classes/raven-auth-resource.php)) - these are
 essentially implementations of the request to and response from raven - including 
 the neccessary methods for parsing and verifying the response.
 
-### `new RavenAuthRequest($parameters = array(), $raven_service = null)`
+### RavenAuthRequest
+
+```php
+new RavenAuthRequest($parameters = array(), $raven_service = null);
+```
 
 `$parameters` is an optional array of raven parameters as specified [here](blob/b431bf50fef32aa201ad1f4a1579c8ce14268832/classes/raven-auth-request.php#L18-L50).
 
@@ -144,44 +148,34 @@ echo $request->getRavenURL();
 // https://demo.raven.cam.ac.uk/auth/authenticate.html?ver=3&date=20141003131322z&msg=This%20is%20a%20message&url=https%3A%2F%2Fexample.com
 ```
 
-### `new RavenAuthResponse($response = null, $raven_service = null)`
+### RavenAuthResponse
+
+```php
+new RavenAuthResponse($response = null, $raven_service = null);
+```
 
 `$response` is the response from raven.
 
 `$raven_service` is an optional instance of a class that implements the 
 `RavenAuthServiceInterface` - this is useful for using the demo raven server.
 
-To check that a response is valid you must call the following methods:
+To check that a response is valid you must call the following methods.
 
-#### `RavenAuthResponse->verifySignature()`
+ - `verifyStatus()`
+ - `verifySignature()`
+ - `verifyIssue()`
+ - `verifyURL($trusted_hosts = null, $trust_all_hosts = null)` - You must either pass an
+   array of trused hosts (see section below) or pass `true` for $trust_all_hosts (YOU MUST 
+   UNDERSTAND THE SECURITY IMPLICATIONS OF DOING THIS - READ THE SECTION BELOW).
+ - `verifyAuthOrSSO()`
 
-Returns `true` or throws a `RavenAuthResponseVerificationException`.
+The above methods all throw exceptions on failure.
 
-#### `RavenAuthResponse->verifyIssue()`
+If you set 'iact' in the request then you need `verifyAuth()` as well (returns `true` 
+or `false`).
 
-Returns `true` or throws a `RavenAuthResponseVerificationException`.
-
-#### `RavenAuthResponse->verifyURL($trusted_hosts = null, $trust_all_hosts = null)`
-
-You must either pass an array of trused hosts (see section below) or pass
-`true` for $trust_all_hosts (YOU MUST UNDERSTAND THE SECURITY IMPLICATIONS OF
-DOING THIS - READ THE SECTION BELOW).
-
-Returns `true` or throws a `RavenAuthResponseVerificationException`.
-
-#### `RavenAuthResponse->verifyAuthOrSSO($type = "pwd")`
-
-Returns `true` or `false`.
-
-#### If you set 'iact' in the request then you need this as well: `RavenAuthResponse->verifyAuth()`
-
-Returns `true` or `false`.
-
-#### To only allow current university members then you need: `RavenAuthResponse->verifyPtags()`
-
-Returns `true` or `false`.
-
-
+To only allow current university members then you need `verifyPtags()` (returns `true` 
+or `false`.
 
 
 ## Library configuration constants
