@@ -32,7 +32,8 @@ hooks it into the WordPress users system.
 The low level API (specified below) offers full flexibility and closely follows 
 the raven spec (keeps the names of parameters the same as those in the spec).
 This makes it quite cumbersome to use so there is a higher level API that is 
-more user friendly (clear what options mean from name).
+more user friendly and does a lot of the heavy lifting for you (at the expense 
+of flexibility)
 
 ### `RavenAuthClient`
 
