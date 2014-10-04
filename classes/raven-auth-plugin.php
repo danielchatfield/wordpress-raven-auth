@@ -33,7 +33,7 @@ class RavenAuthPlugin extends RavenAuthClient {
     public function _install() {
         // plugin has just been activated
         if( !ra_get_option('salt') ) {
-            ra_set_option('salt', wp_generate_password( $length=25 ));
+            ra_update_option('salt', wp_generate_password( $length=25 ));
         }
     }
 
