@@ -5,7 +5,7 @@
  * Description: Quick and easy auth for University of Cambridge sites.
  * Author: Daniel Chatfield
  * Author URI: http://www.danielchatfield.com
- * Version 0.0.0
+ * Version 0.0.1
  *
  * GitHub Plugin URI: danielchatfield/wordpress-raven-auth
  */
