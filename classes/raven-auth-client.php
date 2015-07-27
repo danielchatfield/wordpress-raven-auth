@@ -234,7 +234,7 @@ class RavenAuthClient {
     }
 
     public function redirect() {
-        if (is_null($this->redirect_to or empty($this->redirect_to))) {
+        if (is_null($this->redirect_to) or empty($this->redirect_to)) {
             return;
         } else {
             $this->_redirect($this->redirect_to);
